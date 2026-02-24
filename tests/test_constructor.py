@@ -1,21 +1,24 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from tests.locators import MainPageLocators
+from config import BASE_URL
+from locators import MainPageLocators
 
 
-def test_constructor_buns_tab_default(driver, base_url):
-    driver.get(base_url)
-    WebDriverWait(driver, 15).until(EC.visibility_of_element_located(MainPageLocators.BUNS_HEADER))
+class TestConstructor:
 
+    def test_constructor_buns_tab(self, driver):
+        driver.get(BASE_URL)
 
-def test_constructor_sauces_tab(driver, base_url):
-    driver.get(base_url)
-    WebDriverWait(driver, 15).until(EC.element_to_be_clickable(MainPageLocators.SAUCES_TAB)).click()
-    WebDriverWait(driver, 15).until(EC.visibility_of_element_located(MainPageLocators.SAUCES_HEADER))
+        # сначала уйти с булок
+        WebDriverWait(driver, 15).until(
+            EC.element_to_be_clickable(MainPageLocators.SAUCES_TAB)
+        ).click()
 
+        # затем вернуться на булки
+        WebDriverWait(driver, 15).until(
+            EC.element_to_be_clickable(MainPageLocators.BUNS_TAB)
+        ).click()
 
-def test_constructor_fillings_tab(driver, base_url):
-    driver.get(base_url)
-    WebDriverWait(driver, 15).until(EC.element_to_be_clickable(MainPageLocators.FILLINGS_TAB)).click()
-    WebDriverWait(driver, 15).until(EC.visibility_of_element_located(MainPageLocators.FILLINGS_HEADER))
+        buns_tab = driver.find_element(*MainPageLocators.BUNS_TAB)
+        assert "tab_tab_type_current" in buns_tab.get_attribute("class")

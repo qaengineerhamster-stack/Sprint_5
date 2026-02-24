@@ -58,3 +58,9 @@ class ProfileLocators:
         "//button[contains(.,'Выход') or contains(.,'Выйти')] | "
         "//a[contains(.,'Выход') or contains(.,'Выйти')]",
     )
+
+    # Ссылка "Конструктор" в личном кабинете
+    CONSTRUCTOR_LINK = (
+        By.XPATH,
+        "//a[contains(@href,'/') and contains(.,'Конструктор')]",
+    )
