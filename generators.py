@@ -1,12 +1,13 @@
+
 import random
 import string
 
 
-def generate_email(cohort: str = "1999", domain: str = "yandex.ru") -> str:
-    suffix = "".join(random.choices(string.digits, k=3))
-    return f"testtestov{cohort}{suffix}@{domain}"
+def generate_email() -> str:
+    prefix = "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
+    return f"{prefix}@example.com"
 
 
 def generate_password(length: int = 6) -> str:
-    chars = string.ascii_letters + string.digits
-    return "".join(random.choices(chars, k=length))
+    alphabet = string.ascii_letters + string.digits
+    return "".join(random.choices(alphabet, k=length))

@@ -64,3 +64,4 @@ class ProfileLocators:
         By.XPATH,
         "//a[contains(@href,'/') and contains(.,'Конструктор')]",
     )
+    
