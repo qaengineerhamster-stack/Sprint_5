@@ -1,9 +1,9 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from locators import RegisterPageLocators, LoginPageLocators
 from generators import generate_email, generate_password
-from helpers import BASE_URL
+from helpers import BASE_URL, wait_page_loaded
+from locators import RegisterPageLocators, LoginPageLocators
 
 
 class TestRegistration:
@@ -12,6 +12,7 @@ class TestRegistration:
         password = generate_password(6)
 
         driver.get(f"{BASE_URL}register")
+        wait_page_loaded(driver)
 
         WebDriverWait(driver, 15).until(
             EC.visibility_of_element_located(RegisterPageLocators.NAME_INPUT)
@@ -21,21 +22,17 @@ class TestRegistration:
         driver.find_element(*RegisterPageLocators.PASSWORD_INPUT).send_keys(password)
         driver.find_element(*RegisterPageLocators.REGISTER_BUTTON).click()
 
-        # Ждём появления формы логина (или редиректа)
-        WebDriverWait(driver, 15).until(
-            lambda d: ("login" in d.current_url)
-            or len(d.find_elements(*LoginPageLocators.LOGIN_BUTTON)) > 0
-        )
+        wait_page_loaded(driver)
 
-        assert ("login" in driver.current_url) or (
-            len(driver.find_elements(*LoginPageLocators.LOGIN_BUTTON)) > 0
-        )
+        # ассерт: что реально на странице логина
+        assert len(driver.find_elements(*LoginPageLocators.LOGIN_BUTTON)) > 0
 
     def test_registration_incorrect_short_password(self, driver):
         email = generate_email()
-        password = generate_password(5)  # короткий
+        password = generate_password(5)  # короткий пароль
 
         driver.get(f"{BASE_URL}register")
+        wait_page_loaded(driver)
 
         WebDriverWait(driver, 15).until(
             EC.visibility_of_element_located(RegisterPageLocators.NAME_INPUT)
@@ -45,8 +42,10 @@ class TestRegistration:
         driver.find_element(*RegisterPageLocators.PASSWORD_INPUT).send_keys(password)
         driver.find_element(*RegisterPageLocators.REGISTER_BUTTON).click()
 
-        WebDriverWait(driver, 15).until(
+        # тут НЕ надо ждать пароль-ошибку как успех? — но это и есть проверка
+        # значит делаем ожидание НЕ как "успех", а как "нейтрально"? Нейтрального маркера нет.
+        # поэтому здесь допустимо ждать появления ошибки и потом assert по тексту/наличию.
+        error = WebDriverWait(driver, 15).until(
             EC.visibility_of_element_located(RegisterPageLocators.PASSWORD_ERROR)
         )
-
-        assert len(driver.find_elements(*RegisterPageLocators.PASSWORD_ERROR)) > 0
+        assert error.is_displayed()
